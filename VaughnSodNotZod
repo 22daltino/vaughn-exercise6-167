@@ -1,0 +1,459 @@
+//AUTHOR: Dalton Vaughn
+//COURSE: CPT167
+//PURPOSE: This lets you enter the item you want to purchase
+//and gives you an option to get a senior discount or member discount
+//if you are not a member or senior, then you can select no-discount.
+//CREATED: 02/16/2021
+
+package edu.cpt167.vaughn.exercise6;
+
+//import Scanner for user input
+import java.util.Scanner;
+
+//Start of Main Class
+public class VaughnMainClass 
+{
+
+	//CLASS CONSTANTS
+	public static final double TAX_RATE = 0.075;
+	public static final String DISCOUNT_NAME_MEMBER = "Member";
+	public static final String DISCOUNT_NAME_SENIOR = "Senior";
+	public static final String DISCOUNT_NAME_NONE = "No Discount";
+	public static final String DISCOUNT_NAME_QUIT = "Quit";
+	public static final double DISCOUNT_RATE_MEMBER = 0.15;
+	public static final double DISCOUNT_RATE_SENIOR = 0.25;
+	public static final double DISCOUNT_RATE_NONE = 0.0;
+	public static final String ITEM_NAME_PREMIUM = "PS5";
+	public static final String ITEM_NAME_SPECIAL = "X-BOX ONE";
+	public static final String ITEM_NAME_BASIC = "GAMEBOY";
+	public static final String ITEM_NAME_RETURN = "Return to Main Menu";
+	public static final double ITEM_PRICE_PREMIUM = 55.95;
+	public static final double ITEM_PRICE_SPECIAL = 24.95;
+	public static final double ITEM_PRICE_BASIC = 15.95;
+	public static final int RESET_VALUE = 0;
+
+	//START OF MAIN METHOD
+	public static void main(String[] args)
+	{
+		//Create scanner for input
+		Scanner input = new Scanner(System.in);
+
+		//VARIABLES
+		String userName = "";
+		char rateSelection = ' ';
+		char itemSelection = ' ';
+		int howMany = 0;
+		String discountName = "";
+		double discountRate = 0.0;
+		String itemName = "";
+		double itemPrice = 0.0;
+		double discountAmount = 0.0;
+		double discountPrice = 0.0;
+		double subTotal = 0.0;
+		double tax = 0.0;
+		double totalCost = 0.0;
+		int memberCount = 0;
+		int seniorCount = 0;
+		int noDiscountCount = 0;
+		double grandTotal = 0.0;
+		int premiumCount = 0;
+		int specialCount = 0;
+		int basicCount = 0;
+		double purchaseAmt = 0.0;		
+
+		//Display Welcome Banner
+		displayWelcomeBanner();
+
+		//INPUT SECTION
+
+		//Get user name
+		userName = getUserName(input);
+
+		//get and validate Discount Selection
+		rateSelection = validateMainMenu(input);
+
+		//Start run-while for rate selection
+		while (rateSelection !='Q')
+		{
+			//Get and validate Item Selection
+			itemSelection = validateItemMenu(input);
+
+			//Start run-while for item selection
+			while (itemSelection !='R') 
+			{
+				//Get and validate How Many Items they want to purchase
+				howMany = validateHowMany(input);
+
+				//PROCESSES
+
+				//START IF STATEMENTS FOR DISCOUNTS
+				//Start test if rate selection is A
+				if (rateSelection == 'A')
+				{
+					discountName = DISCOUNT_NAME_MEMBER;
+					discountRate = DISCOUNT_RATE_MEMBER;
+					memberCount++;
+				}//End test if rate selection is A
+
+				//Start test if rate selection is B
+				else if (rateSelection == 'B')
+				{
+					discountName = DISCOUNT_NAME_SENIOR;
+					discountRate = DISCOUNT_RATE_SENIOR;
+					seniorCount++;
+				}//End test if selection is B
+
+				//Start test if selection is C
+				else
+				{
+					discountName = DISCOUNT_NAME_NONE;
+					discountRate = DISCOUNT_RATE_NONE;
+					noDiscountCount++;
+				}//End test if selection is C
+				//END IF STATEMENTS FOR DISCOUNTS
+
+				//START IF STATEMENTS FOR ITEMS
+				//Start test if item selection is A
+				if(itemSelection == 'A')
+				{
+					itemName = ITEM_NAME_PREMIUM;
+					itemPrice = ITEM_PRICE_PREMIUM;
+					premiumCount++;
+				}//End test if item selection is A
+
+				//Start test if item selection is B
+				else if(itemSelection == 'B')
+				{
+					itemName = ITEM_NAME_SPECIAL;
+					itemPrice = ITEM_PRICE_SPECIAL;
+					specialCount++;
+				}//End test if item selection is B
+
+				//Start test if item selection is C
+				else
+				{
+					itemName = ITEM_NAME_BASIC;
+					itemPrice = ITEM_PRICE_BASIC;
+					basicCount++;
+				}//End test if item selection is C
+				//END IF STATEMENTS FOR ITEMS
+
+				//CALCULATIONS
+				discountAmount = itemPrice * discountRate;
+				discountPrice = itemPrice - discountAmount;
+				purchaseAmt = howMany * discountPrice;
+				subTotal = subTotal + purchaseAmt;
+
+				//Display the item receipt
+				displayItemReceipt(itemName, itemPrice, discountName, discountRate, discountAmount, discountPrice, howMany, purchaseAmt, subTotal);
+
+				//Get and Validate itemSelection
+				itemSelection = validateItemMenu(input);
+			}//End run-while for item selection
+
+			//Calculations
+			tax = subTotal * TAX_RATE;
+			totalCost = subTotal + tax;
+			grandTotal = grandTotal + totalCost;
+
+			//Display the Order Total
+			displayOrderTotal(userName, subTotal, tax, totalCost);
+
+			//RESET THE SUBTOTAL
+			subTotal = RESET_VALUE;
+
+			//Get and validate rateSelection
+			rateSelection = validateMainMenu(input);
+		}//End run-while for rate selection
+
+		//Start if statement for grand total
+		if (grandTotal > 0.0)
+		{
+			//Display the Final Report
+			displayFinalReport(memberCount, seniorCount, noDiscountCount, premiumCount, specialCount, basicCount, grandTotal);
+		}//END of grandTotal if statement
+
+		//Display the Farewell Message
+		displayFarewellMessage();
+
+		//Close the scanner for input
+		input.close();
+	}//END OF MAIN METHOD
+
+	//Start of displayWelcomeBanner METHOD to display the welcome banner
+	public static void displayWelcomeBanner()
+	{
+		System.out.println("----------------------------------------------");
+		System.out.println("Welcome to the Gamestop program"); 
+		System.out.println("This will allow you to enter the item you want");
+		System.out.println("to purchase and see if you qualify for a");
+		System.out.println("member, or senior discount.");
+		System.out.println("----------------------------------------------\n");
+	}//END OF displayWelcomeBanner METHOD
+
+	//Start of displayFarewellMessage Method to display the farewell message
+	public static void displayFarewellMessage()
+	{
+		System.out.println("Thank you for using the Gamestop program.");
+		System.out.println("Have an amazing day!");
+	}//END OF displayFarewellMessage Method
+
+	//Start of itemReceipt METHOD to display the item receipt
+	//prints the Item Receipt to the console
+	public static void displayItemReceipt(String borrowedItemName, double borrowedItemPrice, String borrowedDiscountName, double borrowedDiscountRate, double borrowedDiscountAmount, double borrowedDiscountPrice, int borrowedHowMany, double borrowedPurchaseAmt, double borrowedSubTotal)
+	{
+		//OUTPUT
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");
+		System.out.println("ITEM REPORT");
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");
+
+		//The following should print: 2 columns
+		//all columns are left aligned with 26 minimum characters
+		//all fields are printed as Strings (%s)
+		System.out.printf("%-18s%-15s\n","Item Name", borrowedItemName);
+
+		//The following should print: 3 columns
+		//all columns are left aligned with 26 minimum characters
+		//1 field is printed as a double WITH 2 DECIMAL PLACES(%.2f)
+		System.out.printf("%-18s%-4s%3.2f\n", "Original Price", "$", borrowedItemPrice);
+
+		//The following should print: 2 columns
+		//1 column is left aligned with 26 minimum characters
+		//all fields are printed as Strings (%s)
+		System.out.printf("%-18s%4s\n", "Discount Type", borrowedDiscountName);
+
+		//The following should print: 3 columns
+		//all columns are left aligned with 26 minimum characters
+		//1 field is printed as a double WITH 2 DECIMAL PLACES(%.2f)
+		System.out.printf("%-18s%8.1f%-5s\n", "Discount Rate", borrowedDiscountRate * 100, "%");
+
+		//The following should print: 3 columns
+		//all columns are left aligned with 26 minimum characters
+		//1 field is printed as a double WITH 2 DECIMAL PLACES(%.2f)
+		System.out.printf("%-18s%-5s%.2f\n", "Discount Amount", "$", borrowedDiscountAmount);
+
+		//The following should print: 3 columns
+		//all columns are left aligned with 26 minimum characters
+		//1 field is printed as a double WITH 2 DECIMAL PLACES(%.2f)
+		System.out.printf("%-18s%-4s%.2f\n", "Discount Price", "$", borrowedDiscountPrice);
+
+		//The following should print: 2 columns
+		//1 column is left aligned with 26 minimum characters
+		//all fields are printed as Strings (%s)
+		System.out.printf("%-18s%9d\n", "Quantity", borrowedHowMany);
+
+		//The following should print: 3 columns
+		//1 column is left aligned with 26 minimum characters
+		//1 field is right aligned and is printed as a double WITH 2 DECIMAL PLACES(%.2f)
+		System.out.printf("%-18s%-3s%6.2f\n", "Purchase Amount", "$", borrowedPurchaseAmt);
+
+		//The following should print: 3 columns
+		//1 column is left aligned with 26 minimum characters
+		//1 field is right aligned and is printed as a double WITH 2 DECIMAL PLACES(%.2f)
+		System.out.printf("%-18s%-3s%6.2f\n", "SubTotal", "$", borrowedSubTotal);
+
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");
+	}//END OF itemReceipt Method
+
+	//Start of orderTotal METHOD to display the order total
+	//prints the Order Total to the console
+	public static void displayOrderTotal(String borrowedUserName, double borrowedSubTotal, double borrowedTax, double borrowedTotalCost)
+	{
+		//OUTPUT
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");
+		System.out.println("Order Total");
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");
+
+		//The following should print: 2 columns
+		//all columns are left aligned with 26 minimum characters
+		//all fields are printed as Strings (%s)
+		System.out.printf("%-18s%-17s\n","User Name", borrowedUserName);
+
+		//The following should print: 3 columns
+		//all columns are left aligned with 26 minimum characters
+		//1 field is printed as a double WITH 2 DECIMAL PLACES(%.2f)
+		System.out.printf("%-18s%-3s%4.2f\n", "Subtotal", "$", borrowedSubTotal);
+
+		//The following should print: 2 columns
+		//1 column is left aligned with 26 minimum characters
+		//all fields are printed as Strings (%s)
+		System.out.printf("%-18s%-4s%5.2f\n", "Tax","$", borrowedTax);
+
+		//The following should print: 3 columns
+		//all columns are left aligned with 26 minimum characters
+		//1 field is printed as a double WITH 2 DECIMAL PLACES(%.2f)
+		System.out.printf("%-18s%-3s%.2f\n", "Total Cost", "$", borrowedTotalCost);
+
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");
+	}//END OF orderTotal Method
+
+	//Start of finalReport Method to display the Final Report 
+	//prints the Final Report to the console
+	public static void displayFinalReport (int borrowedMemberCount, int borrowedSeniorCount, int borrowedNoDiscountCount, int borrowedPremiumCount, int borrowedSpecialCount, int borrowedBasicCount, double borrowedGrandTotal)
+	{
+		//OUTPUT
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");
+		System.out.println("Final Report");
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");
+
+		//The following should print: 2 columns
+		//1 column is left aligned with 20 minimum characters
+		System.out.printf("%-20s\n", "Count of discount types:");
+
+		//The following should print: 2 columns
+		//1 column is left aligned with 20 minimum characters
+		System.out.printf("%-20s%14d\n", DISCOUNT_NAME_MEMBER, borrowedMemberCount);
+
+		//The following should print: 2 columns
+		//1 column is left aligned with 20 minimum characters
+		System.out.printf("%-20s%14d\n", DISCOUNT_NAME_SENIOR, borrowedSeniorCount);
+
+		//The following should print: 2 columns
+		//1 column is left aligned with 20 minimum characters
+		System.out.printf("%-20s%14d\n", DISCOUNT_NAME_NONE, borrowedNoDiscountCount);
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");
+
+		//The following should print: 2 columns
+		//1 column is left aligned with 20 minimum characters
+		System.out.printf("%-20s\n", "Count of item types:");
+
+		//The following should print: 2 columns
+		//1 column is left aligned with 20 minimum characters
+		System.out.printf("%-20s%14d\n", ITEM_NAME_PREMIUM, borrowedPremiumCount);
+
+		//The following should print: 2 columns
+		//1 column is left aligned with 20 minimum characters
+		System.out.printf("%-20s%14d\n", ITEM_NAME_SPECIAL, borrowedSpecialCount);
+
+		//The following should print: 2 columns
+		//1 column is left aligned with 20 minimum characters
+		System.out.printf("%-20s%14d\n", ITEM_NAME_BASIC, borrowedBasicCount);
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");
+
+		//The following should print: 3 columns
+		//1 column is left aligned with 20 minimum characters
+		//1 field is right aligned and is printed as a double WITH 2 DECIMAL PLACES(%.2f)
+		System.out.printf("%-20s%5s%9.2f\n", "Grand Total", "$", borrowedGrandTotal);
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");
+	}//END OF finalReport Method
+	
+	//Start displayMainMenu Menthod to display the Discount Menu
+	public static void displayMainMenu()
+	{
+		//display DISCOUNT menu
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("DISCOUNT MENU");
+		System.out.printf("%-4s%-14s%1.1f%s\n", "[A]" + " for ", DISCOUNT_NAME_MEMBER, DISCOUNT_RATE_MEMBER * 100, "%");
+		System.out.printf("%-4s%-14s%1.1f%s\n", "[B]" + " for ",DISCOUNT_NAME_SENIOR, DISCOUNT_RATE_SENIOR * 100, "%");
+		System.out.printf("%-4s%-15s%1.1f%s\n", "[C]" + " for ",DISCOUNT_NAME_NONE, DISCOUNT_RATE_NONE * 100, "%");
+		System.out.printf("%-4s%-18s\n", "|Q|" + " to ", DISCOUNT_NAME_QUIT);
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		//Prompt user to input discount selection
+		System.out.print("Enter your selection here: ");
+	}//END of displayMainMenu Method
+	
+	//Start displayItemMenu method to display the item menu
+	public static void displayItemMenu()
+	{
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("ITEM MENU");
+		System.out.printf("%-4s%-18s%s%1.2f\n", "[A]", ITEM_NAME_PREMIUM, "$", ITEM_PRICE_PREMIUM);
+		System.out.printf("%-4s%-18s%s%1.2f\n", "[B]", ITEM_NAME_SPECIAL, "$", ITEM_PRICE_SPECIAL);
+		System.out.printf("%-4s%-18s%s%1.2f\n", "[B]", ITEM_NAME_BASIC, "$", ITEM_PRICE_BASIC);
+		System.out.printf("%-4s%-19s\n", "[R]", "To Return to Main Menu");
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		//Prompt user to input discount selection
+		System.out.print("Enter your selection here: ");
+	}//END of displayItemMenu method
+
+	//Start of getUserName Method to display the users name
+	public static String getUserName (Scanner borrowedInput)
+	{
+		String localUserName = "";
+		System.out.print("Please enter your first name: ");
+		localUserName = borrowedInput.nextLine();
+
+		//return username to main
+		return localUserName;
+
+	}//END OF getUserName Method
+
+	//Start validateMainMenu Method to DISPLAY Discount MENU
+	public static char validateMainMenu(Scanner borrowedInput)
+	{
+		char localRateSelection;
+
+		//display DISCOUNT menu
+		displayMainMenu();
+		
+		localRateSelection = borrowedInput.next().toUpperCase().charAt(0);
+
+		//START validateMainMenu VALIDATION TO VALIDATE THE DISCOUNT MENU SELECTION
+		while (localRateSelection != 'A' && localRateSelection != 'B' && localRateSelection !='C'&& localRateSelection != 'Q')
+		{
+			//display error
+			System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("The selection made is invalid. Please try again.");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+			//display DISCOUNT menu
+			displayMainMenu();
+			
+			localRateSelection = borrowedInput.next().toUpperCase().charAt(0);
+		}//END OF validateMainMenu method validation
+
+		return localRateSelection;
+	}//END OF validateMainMenu METHOD
+
+	//Start of validateItemnMenu Method to ITEM MENU
+	public static char validateItemMenu(Scanner borrowedInput)
+	{
+		char localItemSelection;
+
+		//display ITEM menu
+		displayItemMenu();
+
+		localItemSelection = borrowedInput.next().toUpperCase().charAt(0);
+
+		//START of validateTransportationMenu VALIDATION TO VALIDATE THE ITEM MENU SELECTION
+		while (localItemSelection != 'A' && localItemSelection != 'B' && localItemSelection != 'C' && localItemSelection !='R')
+		{
+			//display error
+			System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("The selection made is invalid. Please try again.");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+			//display ITEM menu
+			displayItemMenu();
+
+			localItemSelection = borrowedInput.next().toUpperCase().charAt(0);
+		}//END OF validateItemMenu method validation
+		return localItemSelection;
+	}//END OF validateItemMenu METHOD
+
+	//Start of howMany method to display and validate how many items input
+	public static int validateHowMany(Scanner borrowedInput)
+	{
+		int localHowMany = 0;
+
+		//Prompt user to input how many items they want to purchase
+		System.out.print("Please input how many items you want to purchase: ");
+		localHowMany = borrowedInput.nextInt();
+
+		//Start of while statement for localHowMany
+		while (localHowMany <= 0)
+		{
+			//display error
+			System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("The value entered is invalid. Please try again.");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+			//Prompt user to input amount of items they want to purchase
+			System.out.print("Please input how many items you want to purchase: ");
+			localHowMany = borrowedInput.nextInt();
+		}//END OF While statement for localHowMany 
+
+		//return howMany to main
+		return localHowMany;
+	}//END OF howMany method
+}//END OF Main Class
